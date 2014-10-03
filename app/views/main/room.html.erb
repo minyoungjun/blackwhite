@@ -25,14 +25,14 @@ channel.bind('reminder', function(data) {
         $('#my_number').show();
       enemy_action(<%=@room.id%>);
     });
-channel.bind('is_first_result', function(win) {
-    if (win){
-    document.getElementById("inform_text").innerHTML = "방금 턴에는 상대가 승점을 얻었습니다. 이제 당신이 후공이므로 상대가 낼 때까지 기다려주세요.";    
+channel.bind('is_first_result', function(data) {
+    if (data.win){
+    document.getElementById("inform_text").innerHTML = "방금 턴에는 상대편이 승점을 얻었습니다ㅠㅠ 이제 당신이 후공이므로 상대가 낼 때까지 기다려주세요.";    
         $('#my_number').hide();
       enemy_action(<%=@room.id%>);
     }
     else{
-        document.getElementById("inform_text").innerHTML = "방금 턴에는 당신이 승점을 얻었습니다.ㅠㅠ이제 당신이 후공이므로 상대가 낼 때까지 기다려주세요.";    
+        document.getElementById("inform_text").innerHTML = "방금 턴에는 당신이 승점을 얻었습니다.이제 당신이 후공이므로 상대가 낼 때까지 기다려주세요.";    
         $('#my_number').hide();
     enemy_action(<%=@room.id%>);
     
