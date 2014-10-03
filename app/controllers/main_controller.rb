@@ -1,6 +1,6 @@
 #coding: utf-8
 class MainController < ApplicationController
-
+=begin
   def turn_action
 
     room = Room.find(params[:id])
@@ -29,7 +29,6 @@ class MainController < ApplicationController
 
       enemy_num ="0~19"
       when 1
-
       enemy_num ="20~39"
       when 2
       enemy_num ="40~59"
@@ -43,7 +42,6 @@ class MainController < ApplicationController
       when 0
       player_num ="0~19"
       when 1
-
       player_num ="20~39"
       when 2
       player_num ="40~59"
@@ -53,8 +51,7 @@ class MainController < ApplicationController
       player_num = "80_99"
       end
 
-
-
+      
         Pusher["#{enemy.token}"].trigger('my_event', {
           message: '상대가 제출을 완료하였습니다. 당신도 내세요.', start: false, turn: 1, ene: player_num, sma: small, myp: enemy_num, my_win: "a", ene_win: "a"
         })
@@ -176,17 +173,9 @@ class MainController < ApplicationController
     end
 
   end
-
+=end
   def index
   @rooms = Room.all
-
-  end
-
-  def hello
-    Pusher['test_channel'].trigger('my_event', {
-      message: '남민수 개병신'
-    })
-    render :text => 'success'
 
   end
 
@@ -216,8 +205,7 @@ class MainController < ApplicationController
       player.user_id = current_user.id
       player.token = SecureRandom.hex(10)
       player.save
+      @player = @room.players.where(:user_id => current_user).last
     end
-    @player = @room.players.where(:user_id => current_user).last
   end
-
 end

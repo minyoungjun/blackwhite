@@ -7,9 +7,15 @@ Rails.application.routes.draw do
   root 'main#index'
   get 'main/hello'
   get 'main/room/:id' => "main#room"
-  get '/main/new_room'
-  post '/main/game_start'
-  post '/main/turn_action'
+  get 'main/new_room'
+  post 'main/game_start'
+  post 'main/turn_action'
+  post 'senders/json_action'
+  post 'senders/game_start'
+  post 'senders/player_action.json' => 'senders#player_action'
+  post 'senders/enemy_action.json' => 'senders#enemy_action'
+  post 'senders/game_start.json' => 'senders#game_start'
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 

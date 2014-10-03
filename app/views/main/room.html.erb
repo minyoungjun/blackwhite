@@ -3,84 +3,43 @@
 
     var pusher = new Pusher('f5cbfca5b8fc658dc583');
     var channel = pusher.subscribe('<%=@player.token%>');
-    channel.bind('my_event', function(data) {
 
-      if (data.start){
-        $('#start_btn').hide();
-      }
-        $('#inform_text').html(data.message);
+    channel.bind('starter', function(data) {
+        $('#inform_text')[0].innerHTML = "게임이 시작되었습니다. 당신은 후공입니다.";
+        document.getElementById("start_btn").style.display = 'none';
+        $('#my_number').hide();
+      enemy_action(<%=@room.id%>);
+        return false;
+        });
 
-        $('#color').html(data.sma);
-
-        $('#enemy_point').html(data.ene);
-        $('#my_point').html(data.myp);  
-        $('#my_win').html(data.my_win);
-        $('#enemy_win').html(data.ene_win);
-
-      if (data.turn == 1){
-        $('#mynum').show();
-      }
-      else{
-        $('#mynum').hide();
-      }
+channel.bind('reminder', function(data) {
+      
+      document.getElementById("inform_text").innerHTML = "상대가 숫자를 제출했습니다. 당신의 숫자를 제출해주세요.";    
+        $('#my_number').show();
+      enemy_action(<%=@room.id%>);
+    });
+channel.bind('is_first_result', function(win) {
+    if (win){
+    document.getElementById("inform_text").innerHTML = "방금 턴에는 상대가 승점을 얻었습니다. 이제 당신이 후공이므로 상대가 낼 때까지 기다려주세요.";    
+        $('#my_number').hide();
+      enemy_action(<%=@room.id%>);
+    }
+    else{
+        document.getElementById("inform_text").innerHTML = "방금 턴에는 당신이 승점을 얻었습니다.ㅠㅠ이제 당신이 후공이므로 상대가 낼 때까지 기다려주세요.";    
+        $('#my_number').hide();
+    enemy_action(<%=@room.id%>);
+    
+    }
+        return false;
     });
   </script>
 
 <h1><%=@room.title%></h1>
 <%if @room.games.count == 0||@room.games.last.winner_id != nil %>
-<a href="#" onclick="javascript:game_start(<%=@room.id%>);" id="start_btn">Game start(누른 사람이 선)</a>
+<a href="#" onclick="javascript:game_start(<%=@room.id%>); return false;" id="start_btn">Game start(누른 사람이 선)</a>
 <%end%>
 <h2 style="color:red;"id="inform_text"></h2>
-  <script type="text/javascript">
-  function turn_action(id){
-  var url = "/main/turn_action";
-    $.ajax({
-       type: "POST",
-       url:url,
-       data: {
-         amount: $('#my_number').val(),
-         id: id,
-         authenticity_token: '<%=form_authenticity_token()%>'
-       },
-       success: function(data){
-         if (data[0] != "success"){
-           alert("그렇게 할 수 없음");
-           
-           }
-           else {
-           }
-       },
-       error: function(){
-             alert("오류");
-       }
-       });
-  }
-  </script>
-
-  <script type="text/javascript">
-  function game_start(id){
-  var url = "/main/game_start";
-    $.ajax({
-       type: "POST",
-       url:url,
-       data: {
-         id: id,
-         authenticity_token: '<%=form_authenticity_token()%>'
-       },
-       success: function(data){
-         if (data[0] == "success"){
-           }
-           else {
-             alert("한명이 더 있어야 시작할 수 있습니다.");
-           }
-       },
-       error: function(){
-             alert("시작 실패");
-       }
-       });
-  }
-  </script>
-
+<h2 style="color:red;"id="inform_text2"></h2>
 <br>
 <table id ="point_table" style="">
   <tr>
@@ -98,20 +57,26 @@
     </td>
   </tr>
   <tr>
-    <td >
-      내 남은 점수
+    <td>
+      내 실제 남은 점수
     </td>
-    <td id="my_point">
+    <td id ="player_real">
+      <%=@player.has_point%>
+    </td>
+  <tr>
+    <td>
+      내 남은 점수구간(상대가 보기에)
+    </td>
+    <td id="player_num">
       80~99
     </td>
   </tr>
   <tr>
     <td>
-      상대가 남은 점수:
+      상대가 남은 점수구간:
     </td>
-    <td id="enemy_point">
+    <td id="enemy_num">
       80~99
-
     </td>
   </tr>
   <tr>
@@ -128,8 +93,157 @@
     </td>
     <td>
 <input type="text" id="my_number">
-<a id="btn_sub"  href="#" onclick="turn_action(<%=@room.id%>);">내기</a>
+<a id="btn_sub"  href="#" onclick="turn_action(<%=@room.id%>); return false;">내기</a>
 </td>
+</tr>
+<tr>
+  <td>
+    <a href="#" onclick="enemy_action(<%=@room.id%>);">새로고침</a>
+  </td>
+</tr>
 
 </table>
+
+
+<script type="text/javascript">
+  function enemy_action(id){
+    var url = "/senders/enemy_action.json";
+    $.ajax({
+       type: "POST",
+       url:url,
+       data: {
+          id: id,
+         authenticity_token: '<%=form_authenticity_token()%>'
+         },
+       dataType:"JSON",
+       success: function(data){
+
+       if(data["success"]){
+
+         document.getElementById("my_win").innerHTML = data["my_win"];
+         document.getElementById("player_real").innerHTML = data["player_real"];
+
+         switch(data["player_num"]){
+          case 4:
+           document.getElementById("player_num").innerHTML = "80 ~ 99";
+          case 3:
+           document.getElementById("player_num").innerHTML = "60 ~ 79";
+          case 2:
+           document.getElementById("player_num").innerHTML = "40 ~ 59";
+          case 1:
+           document.getElementById("player_num").innerHTML = "20 ~ 39";
+          case 0:
+           document.getElementById("player_num").innerHTML = "0 ~ 19";
+         
+         }
+
+         switch(data["enemy_num"]){
+          case 4:
+           document.getElementById("enemy_num").innerHTML = "80 ~ 99";
+          case 3:
+           document.getElementById("enemy_num").innerHTML = "60 ~ 79";
+          case 2:
+           document.getElementById("enemy_num").innerHTML = "40 ~ 59";
+          case 1:
+           document.getElementById("enemy_num").innerHTML = "20 ~ 39";
+          case 0:
+           document.getElementById("enemy_num").innerHTML = "0 ~ 19";
+         
+         }
+
+         document.getElementById("enemy_win").innerHTML = data["enemy_win"];
+         if (data["is_black"]){
+           document.getElementById("color").innerHTML = "black";
+           }else
+           {
+           document.getElementById("color").innerHTML = "white";
+           }
+
+       
+       }
+       return false;
+
+       }
+    });
+  }
+
+  function turn_action(id){
+    var url = "/senders/player_action.json";
+    $.ajax({
+       type: "POST",
+       url:url,
+       data: {
+         amount: $('#my_number').val(),
+         id: id,
+         authenticity_token: '<%=form_authenticity_token()%>'
+         },
+       dataType:"JSON",
+       success: function(data){
+       if (data["success"]){
+         if (data["is_first"]){
+          
+         document.getElementById("inform_text").innerHTML ="숫자를 제출했습니다. 상대방을 기다립니다.";
+      enemy_action(<%=@room.id%>);
+            $('#inform_text2')[0].innerHTML="";
+         
+         }else{
+         if(data["win"]){
+            
+         $('#inform_text')[0].innerHTML="당신이 승점을 얻었습니다.";
+
+              $('#inform_text2')[0].innerHTML="이번 턴은 당신이 선공입니다. 숫자를 내주세요.";
+        $('#my_number').show();
+      enemy_action(<%=@room.id%>);
+              
+            }else{
+              $('#inform_text')[0].innerHTML="상대편이 승점을 얻었습니다.";
+              $('#inform_text2')[0].innerHTML="이번 턴은 당신이 선공입니다. 숫자를 내주세요.";
+        $('#my_number').show();
+      enemy_action(<%=@room.id%>);
+            
+            }
+            
+         }
+      return false;
+         }
+           else {
+             alert("그렇게 할 수 없음");
+           }
+       },
+       error: function(){
+             alert("당신이 낼 차례가 아닙니다.");
+        enemy_action(<%=@room.id%>);
+       }
+       });
+  }
+
+  function game_start(id){
+  var url = "/senders/game_start.json";
+    $.ajax({
+       type: "POST",
+       url:url,
+       data: {
+         id: id,
+         authenticity_token: '<%=form_authenticity_token()%>'
+       },
+       dataType:"JSON",
+       success: function(data){
+       if (data["success"]){
+         $('#inform_text')[0].innerHTML="게임이 시작되었습니다. 당신은 선공입니다.";
+         $('#start_btn').hide();
+        $('#my_number').show();
+
+          
+           }
+           else {
+             alert("한명이 더 있어야 시작할 수 있습니다.");
+             }
+      return false;
+       },
+       error: function(){
+             alert("시작 실패");
+       }
+       });
+  }
+  </script>
 
