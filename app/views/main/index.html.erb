@@ -1,3 +1,4 @@
+
 <h1>흑과백2</h1>
   <% if user_signed_in?%>
   <a href="/users/sign_out">로그아웃</a>
@@ -7,9 +8,11 @@
 <a href="/users/sign_up">회원가입</a>
 <a href="/users/sign_in">로그인</a>
 <%end%>
-<iframe width="560" height="315" src="//www.youtube.com/embed/eb5cGFRrmsg" frameborder="0" allowfullscreen></iframe>
+<iframe width="100%"  scrolling="no"  src="//www.youtube.com/embed/eb5cGFRrmsg" frameborder="0" allowfullscreen></iframe>
 <p>게임규칙: 9판 5선승제<br> 게임시작누른 사람이 선공<br> 후공은 상대보다 커야만 승리(상대숫자와 같아도 후공이 진다.)
-<h2>방목록</h2>
+<h2>참여 가능 방목록(1명 있는 방)</h2>
 <% @rooms.each do |room|%>
-<a href="/main/room/<%=room.id%>"><p><%=room.title%></p></a>
+  <%if room.players.count < 2%>
+    <a href="/main/room/<%=room.id%>"><p><%=room.title%></p></a>
+  <%end%>
 <%end%>

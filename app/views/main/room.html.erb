@@ -3,6 +3,13 @@
 
     var pusher = new Pusher('f5cbfca5b8fc658dc583');
     var channel = pusher.subscribe('<%=@player.token%>');
+  channel.bind('come', function(data) {
+      alert(data.message);
+      document.getElementById("start_btn").style.display = 'block';
+      $("#start_btn").show();
+      $("#waiting").hide();
+
+      });
 
     channel.bind('starter', function(data) {
         $('#inform_text')[0].innerHTML = "게임이 시작되었습니다. 당신은 후공입니다.";
@@ -34,9 +41,12 @@ channel.bind('is_first_result', function(win) {
     });
   </script>
 
-<h1><%=@room.title%></h1>
+  <h1><%=@room.title%></h1>
+  <%if @room.user_id == @user.id%>
+    <h3 id="waiting">누군가가 들어오기를 기다리는 중입니다...</h3>
+  <%end%>
 <%if @room.games.count == 0||@room.games.last.winner_id != nil %>
-<a href="#" onclick="javascript:game_start(<%=@room.id%>); return false;" id="start_btn">Game start(누른 사람이 선)</a>
+  <a href="#" style="<%if @room.user_id == @user.id%>display:none;<%end%>"onclick="javascript:game_start(<%=@room.id%>); return false;" id="start_btn">Game start(누른 사람이 선)</a>
 <%end%>
 <h2 style="color:red;"id="inform_text"></h2>
 <h2 style="color:red;"id="inform_text2"></h2>
@@ -98,7 +108,7 @@ channel.bind('is_first_result', function(win) {
 </tr>
 <tr>
   <td>
-    <a href="#" onclick="enemy_action(<%=@room.id%>);">새로고침</a>
+    <a href="#" onclick="enemy_action(<%=@room.id%>); return false;">새로고침</a>
   </td>
 </tr>
 
@@ -123,32 +133,52 @@ channel.bind('is_first_result', function(win) {
          document.getElementById("my_win").innerHTML = data["my_win"];
          document.getElementById("player_real").innerHTML = data["player_real"];
 
-         switch(data["player_num"]){
+          switch(parseInt(data["player_num"])){
+          case 5:
+          document.getElementById("player_num").innerHTML = "80 ~ 99";
+          break;
           case 4:
            document.getElementById("player_num").innerHTML = "80 ~ 99";
+          break;
           case 3:
            document.getElementById("player_num").innerHTML = "60 ~ 79";
+          break;
           case 2:
            document.getElementById("player_num").innerHTML = "40 ~ 59";
+          break;
           case 1:
            document.getElementById("player_num").innerHTML = "20 ~ 39";
+          break;
           case 0:
            document.getElementById("player_num").innerHTML = "0 ~ 19";
+          break;
+          default:
+           alert("게임 종료");
+           return false;
          
          }
-
-         switch(data["enemy_num"]){
+          switch(parseInt(data["enemy_num"])){
+          case 5:
+           document.getElementById("player_num").innerHTML = "80 ~ 99";
+          break;
           case 4:
            document.getElementById("enemy_num").innerHTML = "80 ~ 99";
+          break;
           case 3:
            document.getElementById("enemy_num").innerHTML = "60 ~ 79";
+          break;
           case 2:
            document.getElementById("enemy_num").innerHTML = "40 ~ 59";
+          break;
           case 1:
            document.getElementById("enemy_num").innerHTML = "20 ~ 39";
+          break;
           case 0:
            document.getElementById("enemy_num").innerHTML = "0 ~ 19";
-         
+          break;
+          default:
+           alert("게임 종료");
+           return false();
          }
 
          document.getElementById("enemy_win").innerHTML = data["enemy_win"];
@@ -161,6 +191,7 @@ channel.bind('is_first_result', function(win) {
 
        
        }
+
        return false;
 
        }
@@ -181,10 +212,11 @@ channel.bind('is_first_result', function(win) {
        success: function(data){
        if (data["success"]){
          if (data["is_first"]){
-          
+         
+         document.getElementById("player_real").innerHTML = data["player_real"];
          document.getElementById("inform_text").innerHTML ="숫자를 제출했습니다. 상대방을 기다립니다.";
-      enemy_action(<%=@room.id%>);
-            $('#inform_text2')[0].innerHTML="";
+        $('#inform_text2')[0].innerHTML="";
+
          
          }else{
          if(data["win"]){
@@ -193,22 +225,22 @@ channel.bind('is_first_result', function(win) {
 
               $('#inform_text2')[0].innerHTML="이번 턴은 당신이 선공입니다. 숫자를 내주세요.";
         $('#my_number').show();
-      enemy_action(<%=@room.id%>);
               
             }else{
               $('#inform_text')[0].innerHTML="상대편이 승점을 얻었습니다.";
               $('#inform_text2')[0].innerHTML="이번 턴은 당신이 선공입니다. 숫자를 내주세요.";
         $('#my_number').show();
-      enemy_action(<%=@room.id%>);
             
             }
             
          }
-      return false;
          }
            else {
              alert("그렇게 할 수 없음");
            }
+
+      enemy_action(<%=@room.id%>);
+      return false;
        },
        error: function(){
              alert("당신이 낼 차례가 아닙니다.");

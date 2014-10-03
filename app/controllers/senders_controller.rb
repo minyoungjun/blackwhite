@@ -1,17 +1,5 @@
+#coding: utf-8
 class SendersController < ApplicationController
-=begin
-  def push_notify
-    room = Room.find(params[:id])
-
-
-    room.players.each do |player|
-
-        Pusher["#{player.token}"].trigger('reminder', {
-          data: true })
-
-    end
-  end
-=end
 
   def game_start
 
@@ -47,8 +35,12 @@ class SendersController < ApplicationController
     room = Room.find(params[:id])
     game = room.games.last
     player = room.players.where(:user_id => current_user.id).first
-    enemy = game.players.where.not(user_id: current_user.id).first
-    enemy_point = enemy.points.last.amount.to_i
+    enemy = room.players.where.not(user_id: current_user.id).first
+    if enemy.points.count == 0
+      enemy_point = 0
+    else
+      enemy_point = enemy.points.last.amount.to_i
+    end
     if 0 <= enemy_point && enemy_point <= 9
       is_black = 1 #9이하
     elsif 10 <= enemy_point
@@ -56,9 +48,9 @@ class SendersController < ApplicationController
     else
       is_black = -1
     end
-    enemy_num = ((enemy.has_point.to_i)/20).to_i
-    player_num = ((player.has_point.to_i)/20).to_i
-    render :json => {"success" => true, "is_first" => player.is_first , "player_real" => player.has_point, "player_num" => player_num, "enemy_num" => enemy_num, "my_win" => player.turns.count, "enemy_win" => enemy.turns.count, "is_black" => is_black }
+    enemy_num = enemy.has_point/20
+    player_num = player.has_point/20
+    render :json => {"success" => true, "is_first" => player.is_first, "player_real" => player.has_point, "player_num" => player_num, "enemy_num" => enemy_num, "my_win" => player.turns.count, "enemy_win" => enemy.turns.count, "is_black" => is_black }
 
   end
 
@@ -114,7 +106,6 @@ class SendersController < ApplicationController
       if point.amount > turn.points.first.amount
         turn.player_id = player.id
         turn.save
-    puts player.id.to_s + "승리-======"
 
       Pusher["#{enemy.token}"].trigger('is_first_result', {
       win: true })
@@ -124,7 +115,6 @@ class SendersController < ApplicationController
       else
         turn.player_id = enemy.id
         turn.save
-        puts player.id.to_s + "패배-=========="
 
       Pusher["#{enemy.token}"].trigger('is_first_result', {
       win: false })
