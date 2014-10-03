@@ -1,0 +1,135 @@
+
+  <script type="text/javascript">
+
+    var pusher = new Pusher('f5cbfca5b8fc658dc583');
+    var channel = pusher.subscribe('<%=@player.token%>');
+    channel.bind('my_event', function(data) {
+
+      if (data.start){
+        $('#start_btn').hide();
+      }
+        $('#inform_text').html(data.message);
+
+        $('#color').html(data.sma);
+
+        $('#enemy_point').html(data.ene);
+        $('#my_point').html(data.myp);  
+        $('#my_win').html(data.my_win);
+        $('#enemy_win').html(data.ene_win);
+
+      if (data.turn == 1){
+        $('#mynum').show();
+      }
+      else{
+        $('#mynum').hide();
+      }
+    });
+  </script>
+
+<h1><%=@room.title%></h1>
+<%if @room.games.count == 0||@room.games.last.winner_id != nil %>
+<a href="#" onclick="javascript:game_start(<%=@room.id%>);" id="start_btn">Game start(누른 사람이 선)</a>
+<%end%>
+<h2 style="color:red;"id="inform_text"></h2>
+  <script type="text/javascript">
+  function turn_action(id){
+  var url = "/main/turn_action";
+    $.ajax({
+       type: "POST",
+       url:url,
+       data: {
+         amount: $('#my_number').val(),
+         id: id,
+         authenticity_token: '<%=form_authenticity_token()%>'
+       },
+       success: function(data){
+         if (data[0] != "success"){
+           alert("그렇게 할 수 없음");
+           
+           }
+           else {
+           }
+       },
+       error: function(){
+             alert("오류");
+       }
+       });
+  }
+  </script>
+
+  <script type="text/javascript">
+  function game_start(id){
+  var url = "/main/game_start";
+    $.ajax({
+       type: "POST",
+       url:url,
+       data: {
+         id: id,
+         authenticity_token: '<%=form_authenticity_token()%>'
+       },
+       success: function(data){
+         if (data[0] == "success"){
+           }
+           else {
+             alert("한명이 더 있어야 시작할 수 있습니다.");
+           }
+       },
+       error: function(){
+             alert("시작 실패");
+       }
+       });
+  }
+  </script>
+
+<br>
+<table id ="point_table" style="">
+  <tr>
+    <td>
+      당신의 승점:
+    </td>
+    <td id="my_win">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      상대편 승점:
+    </td>
+    <td id="enemy_win">
+    </td>
+  </tr>
+  <tr>
+    <td >
+      내 남은 점수
+    </td>
+    <td id="my_point">
+      80~99
+    </td>
+  </tr>
+  <tr>
+    <td>
+      상대가 남은 점수:
+    </td>
+    <td id="enemy_point">
+      80~99
+
+    </td>
+  </tr>
+  <tr>
+    <td>
+      상대의 방금 색깔(0~9:black, 10~:white):
+    </td>
+    <td id ="color">
+      
+    </td>
+  </tr>
+  <tr id="mynum">
+    <td>
+낼 숫자:
+    </td>
+    <td>
+<input type="text" id="my_number">
+<a id="btn_sub"  href="#" onclick="turn_action(<%=@room.id%>);">내기</a>
+</td>
+
+</table>
+
