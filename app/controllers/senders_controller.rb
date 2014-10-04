@@ -1,10 +1,18 @@
 #coding: utf-8
 class SendersController < ApplicationController
-
-  def game_start
-
+  def change_title
     room = Room.find(params[:id])
-  if room.players.where(:user_id => current_user.id).count == 1 && room.players.count == 2
+    if room.user_id = current_user.id
+      room.title = params["title"]
+      room.save
+      render :json => {:success => true, :wow => false, :title => room.title}
+    else
+      render :json => {:success => false, :wow => false}
+    end
+  end
+  def game_start
+    room = Room.find(params[:id])
+    if room.players.count == 2 && room.games.count == 0
     game = Game.new
     game.room_id = room.id
     game.save
@@ -22,10 +30,41 @@ class SendersController < ApplicationController
           data: true })
            player.is_first = false
            player.save
-       end
-    end
+         end
+      end
     render :json => {:success => true, :wow => false}
+    elsif  room.players.count == 2
+
+    game = Game.new
+    game.room_id = room.id
+    game.save
+    turn  = Turn.new
+    turn.game_id = game.id
+    turn.save
+    room.players.each do |player|
+        player.turns.each do |p_turn|
+          p_turn.delete
+        end
+       player.game_id = game.id
+       player.has_point = 99
+       player.save
+       if player.user_id == current_user.id
+         player.is_first = true
+         player.save
+        else
+        Pusher["#{player.token}"].trigger('starter', {
+          data: true })
+           player.is_first = false
+           player.save
+        end
+      end
+
+
+      render :json => {:success => true, :wow => false}
     else
+
+
+
       render :json => {:success => false, :wow => false}
     end
 
@@ -50,6 +89,13 @@ class SendersController < ApplicationController
     end
     enemy_num = enemy.has_point/20
     player_num = player.has_point/20
+    if player.turns.count > 4
+      game.winner_id = player.user.id
+      game.save
+    elsif enemy.turns.count > 4
+      game.loser_id = enemy.user.id
+      game.save
+    end
     render :json => {"success" => true, "is_first" => player.is_first, "player_real" => player.has_point, "player_num" => player_num, "enemy_num" => enemy_num, "my_win" => player.turns.count, "enemy_win" => enemy.turns.count, "is_black" => is_black }
 
   end

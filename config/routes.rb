@@ -15,6 +15,9 @@ Rails.application.routes.draw do
   post 'senders/player_action.json' => 'senders#player_action'
   post 'senders/enemy_action.json' => 'senders#enemy_action'
   post 'senders/game_start.json' => 'senders#game_start'
+  post 'senders/change_title.json' => "senders#change_title"
+  post 'main/feedback'
+  get 'main/read'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

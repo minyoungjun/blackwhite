@@ -4,16 +4,15 @@
     var pusher = new Pusher('f5cbfca5b8fc658dc583');
     var channel = pusher.subscribe('<%=@player.token%>');
   channel.bind('come', function(data) {
-      alert(data.message);
-      document.getElementById("start_btn").style.display = 'block';
       $("#start_btn").show();
       $("#waiting").hide();
+      alert(data.message);
 
       });
 
     channel.bind('starter', function(data) {
         $('#inform_text')[0].innerHTML = "게임이 시작되었습니다. 당신은 후공입니다.";
-        document.getElementById("start_btn").style.display = 'none';
+        $("#start_btn").hide();
         $('#my_number').hide();
       enemy_action(<%=@room.id%>);
         return false;
@@ -40,13 +39,20 @@ channel.bind('is_first_result', function(data) {
         return false;
     });
   </script>
+  <%if @room.user_id == @user.id %>
+    방 제목:<input type="text" style="height: 25px; font-size: 20px;" value="<%=@room.title%>" id="room_title"><a href="#" onclick="javascript:change_title(<%=@room.id%>);">제목변경</a>
+  <%else%>
+    <h1><%=@room.title%></h1>
+  <%end%>
 
-  <h1><%=@room.title%></h1>
   <%if @room.user_id == @user.id%>
     <h3 id="waiting">누군가가 들어오기를 기다리는 중입니다...</h3>
+    <script>
+  $('#start_btn').hide();
+    </script>
   <%end%>
 <%if @room.games.count == 0||@room.games.last.winner_id != nil %>
-  <a href="#" style="<%if @room.user_id == @user.id%>display:none;<%end%>"onclick="javascript:game_start(<%=@room.id%>); return false;" id="start_btn">Game start(누른 사람이 선)</a>
+  <a href="#"  onclick="javascript:game_start(<%=@room.id%>); return false;" id="start_btn">Game start(누른 사람이 선)</a>
 <%end%>
 <h2 style="color:red;"id="inform_text"></h2>
 <h2 style="color:red;"id="inform_text2"></h2>
@@ -191,6 +197,20 @@ channel.bind('is_first_result', function(data) {
 
        
        }
+       if (data["my_win"] > 4){
+        
+          $('#inform_text')[0].innerHTML="게임 종료. 당신의 승리";
+          $('#inform_text2')[0].innerHTML="";
+          alert("당신이 최종 승리했습니다.");
+          $("#start_btn").show();
+       }
+       if (data["enemy_win"] > 4){
+          $('#inform_text')[0].innerHTML="게임 종료. 당신의 패배";
+          $('#inform_text2')[0].innerHTML="";
+          alert("당신이 최종 패배했습니다.");
+          $("#start_btn").show();
+        
+       }
 
        return false;
 
@@ -216,6 +236,7 @@ channel.bind('is_first_result', function(data) {
          document.getElementById("player_real").innerHTML = data["player_real"];
          document.getElementById("inform_text").innerHTML ="숫자를 제출했습니다. 상대방을 기다립니다.";
         $('#inform_text2')[0].innerHTML="";
+        $('#my_number').hide();
 
          
          }else{
@@ -264,6 +285,7 @@ channel.bind('is_first_result', function(data) {
          $('#inform_text')[0].innerHTML="게임이 시작되었습니다. 당신은 선공입니다.";
          $('#start_btn').hide();
         $('#my_number').show();
+        enemy_action(<%=@room.id%>);
 
           
            }
@@ -277,5 +299,34 @@ channel.bind('is_first_result', function(data) {
        }
        });
   }
+
+  function change_title(id){
+  var url = "/senders/change_title.json";
+    $.ajax({
+       type: "POST",
+       url:url,
+       data: {
+        title: $("#room_title").val(),
+         id: id,
+         authenticity_token: '<%=form_authenticity_token()%>'
+       },
+       dataType:"JSON",
+       success: function(data){
+       if (data["success"]){
+          alert( data["title"] + "로 바꿨습니다.");
+          
+           }
+           else {
+             alert("바꿀 수 없습니다.");
+             }
+      return false;
+       },
+       error: function(){
+             alert("연결이 불안정합니다.");
+       }
+       });
+  }
+
+
   </script>
 

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'pusher'
-
+gem 'safe_yaml'
 gem 'devise'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'

@@ -1,9 +1,29 @@
 #coding: utf-8
 class MainController < ApplicationController
+  def feedback
+    letter = Letter.new
+    if user_signed_in?
+      letter.user_id = current_user.id 
+    end
+    letter.content = params[:content]
+    letter.save
+
+    render :text => "<h1>만든 사람에게 전달하였습니다.</h1><p>#{letter.content}</p>"
+
+  end
+  def read
+
+    if user_signed_in?
+      @letters = Letter.all
+    else
+      render :text => "error"
+    end
+  end
+
   def index
 
   @rooms = Room.all
-
+  @user = current_user
   end
 
   def new_room
@@ -24,7 +44,18 @@ class MainController < ApplicationController
 
   def room
     @room = Room.find(params[:id])
+    if user_signed_in?
     @user = current_user
+    else
+      user = User.new({
+        email: "anonymous@#{SecureRandom.hex(10)}.com",
+      password: 'password',
+      password_confirmation: 'password'})
+      user.save
+      sign_in user
+      @user = user
+    end
+
     if @room.games.count == 0 && @room.players.where(:user_id => current_user.id).count > 0
       @player = @room.players.where(:user_id => current_user.id).first
     else

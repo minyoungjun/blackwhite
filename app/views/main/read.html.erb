@@ -1,0 +1,3 @@
+<%@letters.each do |letter|%>
+  <p><%if letter.user_id != nil%><%=letter.user.email%>:<%end%><%=letter.content%></p>
+<%end%>
