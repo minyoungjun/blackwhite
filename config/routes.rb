@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   post 'senders/enemy_action.json' => 'senders#enemy_action'
   post 'senders/game_start.json' => 'senders#game_start'
   post 'senders/change_title.json' => "senders#change_title"
+  post 'senders/send_chat.json' => "senders#send_chat"
   post 'main/feedback'
   get 'main/read'
 

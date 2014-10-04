@@ -1,9 +1,9 @@
-class CreateRooms < ActiveRecord::Migration
+class CreateChats < ActiveRecord::Migration
   def change
-    create_table :rooms do |t|
+    create_table :chats do |t|
       t.integer :user_id
       t.integer :room_id
-      t.string  :title
+      t.text  :content
       t.timestamps
     end
   end

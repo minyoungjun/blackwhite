@@ -11,7 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141004072152) do
+ActiveRecord::Schema.define(version: 20141004112346) do
+
+  create_table "chats", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "room_id"
+    t.text     "content"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "games", force: true do |t|
     t.integer  "room_id"
@@ -50,6 +58,7 @@ ActiveRecord::Schema.define(version: 20141004072152) do
 
   create_table "rooms", force: true do |t|
     t.integer  "user_id"
+    t.integer  "room_id"
     t.string   "title"
     t.datetime "created_at"
     t.datetime "updated_at"

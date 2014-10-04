@@ -1,5 +1,28 @@
 #coding: utf-8
 class SendersController < ApplicationController
+  def send_chat
+    room = Room.find(params[:id])
+
+    if room.players.where(:user_id => current_user.id).count != 0
+
+      chat = Chat.new
+      chat.user_id = current_user.id
+      chat.room_id = room.id
+      chat.content = params[:chat_content]
+      chat.save
+
+      room.players.each do |player|
+        Pusher["#{player.token}"].trigger('chat', {
+          message: chat.content })
+      end
+
+      render :json => {:success => true, :wow => "wow"}
+    else
+      render :json => {:success => false, :wow => "wow"}
+
+    end
+  end
+
   def change_title
     room = Room.find(params[:id])
     if room.user_id = current_user.id
@@ -89,13 +112,17 @@ class SendersController < ApplicationController
     end
     enemy_num = enemy.has_point/20
     player_num = player.has_point/20
+
     if player.turns.count > 4
       game.winner_id = player.user.id
-      game.save
-    elsif enemy.turns.count > 4
       game.loser_id = enemy.user.id
       game.save
+    elsif enemy.turns.count > 4
+      game.winner_id = enemy.user.id
+      game.loser_id = player.user.id
+      game.save
     end
+
     render :json => {"success" => true, "is_first" => player.is_first, "player_real" => player.has_point, "player_num" => player_num, "enemy_num" => enemy_num, "my_win" => player.turns.count, "enemy_win" => enemy.turns.count, "is_black" => is_black }
 
   end
