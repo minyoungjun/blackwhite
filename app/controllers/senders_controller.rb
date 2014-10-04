@@ -131,8 +131,6 @@ class SendersController < ApplicationController
     room = Room.find(params[:id])
     game = room.games.last
     player = room.players.where(:user_id => current_user.id).first
-    player.has_point = player.has_point - params[:amount].to_i
-    player.save
     turn = game.turns.last
 
     if 0 <= params[:amount].to_i && params[:amount].to_i <= 9
@@ -149,6 +147,8 @@ class SendersController < ApplicationController
       point.player_id = player.id
       point.turn_id = turn.id
       point.save
+      player.has_point = player.has_point - point.amount.to_i
+      player.save
       
       enemy = game.players.where(:is_first => false).first
       enemy_num = ((enemy.has_point.to_i)/20).to_i
@@ -166,6 +166,8 @@ class SendersController < ApplicationController
       point.player_id = player.id
       point.turn_id = turn.id
       point.save
+      player.has_point = player.has_point - point.amount.to_i
+      player.save
 
        player.is_first = true
        player.save
