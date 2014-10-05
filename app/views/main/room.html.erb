@@ -53,7 +53,7 @@ channel.bind('is_first_result', function(data) {
   </script>
   <a href="/main/index"><h3>흑과백2 메인화면으로</h3></a>
   <%if @room.user_id == @user.id %>
-    방 제목:<input type="text" style="height: 25px; font-size: 20px;" value="<%=@room.title%>" id="room_title"><a href="#" onclick="javascript:change_title(<%=@room.id%>);">제목변경</a>
+    방 제목:<input type="text" style="height: 25px; font-size: 20px;" value="<%=@room.title%>" id="room_title"><a href="#" onclick="javascript:change_title(<%=@room.id%>);">제목변경</a><br><br>
   <%else%>
     <h1><%=@room.title%></h1>
   <%end%>
@@ -76,6 +76,7 @@ channel.bind('is_first_result', function(data) {
       당신의 승점:
     </td>
     <td id="my_win">
+      0
     </td>
   </tr>
   <tr>
@@ -83,6 +84,7 @@ channel.bind('is_first_result', function(data) {
       상대편 승점:
     </td>
     <td id="enemy_win">
+      0
     </td>
   </tr>
   <tr>

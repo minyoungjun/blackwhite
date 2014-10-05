@@ -70,7 +70,7 @@ class MainController < ApplicationController
         player.save
         @player = @room.players.where(:user_id => current_user).last
         Pusher["#{@room.players.where.not(user_id: current_user).first.token}"].trigger('come', {
-          message: "#{@player.user.email}님께서 입장하셨습니다." })
+          message: "#{@player.user.email}님(전적:#{@player.user.victories.count}승/#{@player.user.loses.count}패)께서 입장하셨습니다." })
       else
         render :text => "이미 2명이 있는 방입니다."
       end

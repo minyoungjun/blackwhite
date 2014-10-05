@@ -1,5 +1,6 @@
+<h1>흑과백2 (ver 2.0)</h1>
 
-<h1>흑과백2</h1>
+<p>업데이트 되면서 속도 빨라졌습니다. 그대신 했던 데이터는 날아갔습니다. 죄송합니다ㅠㅠ</p>
 <% if user_signed_in?%>
   <p><%=@user.email%>님, 환영합니다!</p>
 
@@ -13,12 +14,12 @@
 <a href="/users/sign_in">로그인</a>
 <%end%>
 <iframe width="100%"  scrolling="no"  src="//www.youtube.com/embed/eb5cGFRrmsg" frameborder="0" allowfullscreen></iframe>
-<p>게임규칙: 9판 5선승제<br> 게임시작누른 사람이 선공<br> 후공은 상대보다 커야만 승리(상대숫자와 같아도 후공이 진다.)
+<p>게임규칙: 9판 5선승제<br> 게임시작 누른 사람이 선공<br> 후공은 상대보다 커야만 승리(상대숫자와 같아도 후공이 진다.)
 <h2>참여 가능 방목록(1명 있는 방)</h2>
 <% room_num = 0%>
 <% @rooms.each do |room|%>
   <%if room.players.count < 2%>
-    <a href="/main/room/<%=room.id%>"><p><%=room.title%></p></a>
+    <a href="/main/room/<%=room.id%>"><p><%=room.title%>(방장 전적: <%=room.user.victories.count%>승/<%=room.user.loses.count%>패)</p></a>
     <%room_num = room_num + 1%>
   <%end%>
 <%end%>
