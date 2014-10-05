@@ -60,6 +60,7 @@ ActiveRecord::Schema.define(version: 20141004112346) do
     t.integer  "user_id"
     t.integer  "room_id"
     t.string   "title"
+    t.boolean  "chat_blocked", default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

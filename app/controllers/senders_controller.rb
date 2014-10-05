@@ -1,25 +1,24 @@
 #coding: utf-8
 class SendersController < ApplicationController
+
+  def block_chat
+    room = Room.find(params[:id])
+      if room.players.where(:user_id => current_user.id).count != 0
+        room.chat_blocked = true
+        room.save
+        render :json => {:success => true, :wow => 1}
+      end
+  end
   def send_chat
     room = Room.find(params[:id])
 
     if room.players.where(:user_id => current_user.id).count != 0
-
-      chat = Chat.new
-      chat.user_id = current_user.id
-      chat.room_id = room.id
-      chat.content = params[:chat_content]
-      chat.save
-
-      room.players.each do |player|
-        Pusher["#{player.token}"].trigger('chat', {
-          message: chat.content })
+      if !(room.chat_blocked)
+        SendMessage.perform_async(room.id, current_user.id, params[:chat_content])
       end
-
-      render :json => {:success => true, :wow => "wow"}
+      render :json => {:success => true, :blocked => room.chat_blocked }
     else
-      render :json => {:success => false, :wow => "wow"}
-
+      render :json => {:success => false, :blocked => false}
     end
   end
 
@@ -33,61 +32,17 @@ class SendersController < ApplicationController
       render :json => {:success => false, :wow => false}
     end
   end
+
   def game_start
     room = Room.find(params[:id])
     if room.players.count == 2 && room.games.count == 0
-    game = Game.new
-    game.room_id = room.id
-    game.save
-    turn  = Turn.new
-    turn.game_id = game.id
-    turn.save
-    room.players.each do |player|
-       player.game_id = game.id
-       player.save
-       if player.user_id == current_user.id
-         player.is_first = true
-         player.save
-        else
-        Pusher["#{player.token}"].trigger('starter', {
-          data: true })
-           player.is_first = false
-           player.save
-         end
-      end
+      Game.game_start(room.id, current_user.id, true)
     render :json => {:success => true, :wow => false}
+
     elsif  room.players.count == 2
-
-    game = Game.new
-    game.room_id = room.id
-    game.save
-    turn  = Turn.new
-    turn.game_id = game.id
-    turn.save
-    room.players.each do |player|
-        player.turns.each do |p_turn|
-          p_turn.delete
-        end
-       player.game_id = game.id
-       player.has_point = 99
-       player.save
-       if player.user_id == current_user.id
-         player.is_first = true
-         player.save
-        else
-        Pusher["#{player.token}"].trigger('starter', {
-          data: true })
-           player.is_first = false
-           player.save
-        end
-      end
-
-
+      Game.game_start(room.id, current_user.id, false)
       render :json => {:success => true, :wow => false}
     else
-
-
-
       render :json => {:success => false, :wow => false}
     end
 
@@ -103,6 +58,7 @@ class SendersController < ApplicationController
     else
       enemy_point = enemy.points.last.amount.to_i
     end
+
     if 0 <= enemy_point && enemy_point <= 9
       is_black = 1 #9이하
     elsif 10 <= enemy_point
@@ -110,6 +66,7 @@ class SendersController < ApplicationController
     else
       is_black = -1
     end
+
     enemy_num = enemy.has_point/20
     player_num = player.has_point/20
 
@@ -141,7 +98,7 @@ class SendersController < ApplicationController
 
     player_num = ((player.has_point.to_i)/20).to_i
     
-    if player.is_first && turn.points.count == 0
+    if player.is_first && turn.points.count == 0 && params[:amount].to_i <= player.has_point && 0 <= params[:amount].to_i 
       point = Point.new
       point.amount = params[:amount]
       point.player_id = player.id
@@ -158,7 +115,9 @@ class SendersController < ApplicationController
 
       render :json => {"success" => true, "is_first" => player.is_first , "player_real" => player.has_point, "player_num" => player_num, "enemy_num" => enemy_num, "my_win" => player.turns.count, "enemy_win" => enemy.turns.count, "is_black" => is_black}
 
-    elsif !(player.is_first) && turn.points.count == 1
+    elsif !(player.is_first) && turn.points.count == 1 && params[:amount].to_i <= player.has_point && 0 <= params[:amount].to_i 
+
+
       enemy = turn.points.first.player
       enemy_num = ((enemy.has_point.to_i)/20).to_i
       point = Point.new
@@ -193,6 +152,7 @@ class SendersController < ApplicationController
 
       Pusher["#{enemy.token}"].trigger('is_first_result', {
       win: false })
+
         render :json => {"success" => true, "is_first" => false , "player_real" => player.has_point, "player_num" => player_num, "enemy_num" => enemy_num, "my_win" => player.turns.count, "enemy_win" => enemy.turns.count, "is_black" => is_black, "win"=> false}
       end
 

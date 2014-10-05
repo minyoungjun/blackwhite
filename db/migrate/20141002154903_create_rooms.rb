@@ -4,6 +4,7 @@ class CreateRooms < ActiveRecord::Migration
       t.integer :user_id
       t.integer :room_id
       t.string  :title
+      t.boolean :chat_blocked, default: false
       t.timestamps
     end
   end
