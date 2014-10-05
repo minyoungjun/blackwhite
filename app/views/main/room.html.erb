@@ -21,7 +21,8 @@ channel.bind('chat', function(data) {
         $('#my_number').hide();
         $('#btn_sub').hide();
         $('#my_number').val("");
-      enemy_action(<%=@room.id%>);
+        enemy_action(<%=@room.id%>);
+        $('#color').val("고르는 중...");
         return false;
         });
 
