@@ -10,6 +10,31 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
+ *= require jquery-ui
  *= require_tree .
  *= require_self
  */
+@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+
+body {
+	font-family: 'Nanum Gothic', serif;
+}
+
+.row {
+	margin-top: 15px;
+}
+
+#main-title {
+	text-align: center;
+	font-size: 4em;
+}
+
+#footer {
+	background-color: #222;
+	border-color: #101010;
+	padding: 20px 0;	
+	color: #fff;
+	text-align: center;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}

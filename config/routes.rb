@@ -5,6 +5,7 @@ Rails.application.routes.draw do
 
   # You can have the root of your site routed with "root"
   root 'main#sorry'
+  get 'main/message' => 'main#message'
   get 'instant' => 'main#index'
   get 'main/index' => 'main#index'
   get 'main/room/:id' => "main#room"
