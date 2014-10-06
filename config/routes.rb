@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
-  root 'main#index'
+  root 'main#sorry'
   get 'instant' => 'main#index'
   get 'main/index' => 'main#index'
   get 'main/room/:id' => "main#room"
