@@ -1,5 +1,7 @@
-#coding: utf-8
+#coding: utf-8연락
 class MainController < ApplicationController
+  def message
+  end 
   def feedback
     letter = Letter.new
     if user_signed_in?
