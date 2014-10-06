@@ -1,15 +1,18 @@
-<h1>흑과백2 (ver 2.0)</h1>
+<div class="page-header">
+    <h1>제작자 공지</h1>
+</div>
+<p class="lead">"업데이트 되면서 속도 빨라졌습니다. 그대신 했던 데이터는 날아갔습니다. 죄송합니다ㅠㅠ"</p>
 
-<p>업데이트 되면서 속도 빨라졌습니다. 그대신 했던 데이터는 날아갔습니다. 죄송합니다ㅠㅠ</p>
+
+
 <% if user_signed_in?%>
-  <p><%=@user.email%>님, 환영합니다!</p>
-
-  <p>총 전적: <%=@user.victories.count%>승/<%=@user.loses.count%>패</p>
-  <a href="<%=destroy_user_session_path%>">로그아웃</a>
-  <br>
-  <a href="/main/new_room">방만들기</a>
+<p><%=@user.email%>님, 환영합니다!</p>
+<p>총 전적: <%=@user.victories.count%>승/<%=@user.loses.count%>패</p>
+<a href="<%=destroy_user_session_path%>">로그아웃</a>
+<br>
+<a href="/main/new_room">방만들기</a>
 <%else%>
-  <p>3초만에 할 수 있는 회원가입을 하셔야 방 만들기와 전적관리를 하실 수 있습니다.</p>
+<p>3초만에 할 수 있는 회원가입을 하셔야 방 만들기와 전적관리를 하실 수 있습니다.</p>
 <a href="/users/sign_up">3초만에 회원가입</a>
 <a href="/users/sign_in">로그인</a>
 <%end%>
@@ -18,20 +21,20 @@
 <h2>참여 가능 방목록(1명 있는 방)</h2>
 <% room_num = 0%>
 <% @rooms.each do |room|%>
-  <%if room.players.count < 2%>
-    <a href="/main/room/<%=room.id%>"><p><%=room.title%>(방장 전적: <%=room.user.victories.count%>승/<%=room.user.loses.count%>패)</p></a>
-    <%room_num = room_num + 1%>
-  <%end%>
+<%if room.players.count < 2%>
+<a href="/main/room/<%=room.id%>"><p><%=room.title%>(방장 전적: <%=room.user.victories.count%>승/<%=room.user.loses.count%>패)</p></a>
+<%room_num = room_num + 1%>
+<%end%>
 <%end%>
 <%if room_num == 0%>
-  <p>
+<p>
 열려있는 방이 없습니다.
 </p>
 <%end%>
 <h2>만든 사람에게 하고 싶은 말</h2>
 <form action="/main/feedback" method="post">
-  <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>" />
-<textarea name="content"></textarea><br>
-<input type="submit"value="보내기">
-<p>만들기 쉽고 재밌는 게임 추천 좀</p>
+    <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>" />
+    <textarea name="content"></textarea><br>
+    <input type="submit"value="보내기">
+    <p>만들기 쉽고 재밌는 게임 추천 좀</p>
 </form>

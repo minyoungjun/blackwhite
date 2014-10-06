@@ -13,3 +13,17 @@
  *= require_tree .
  *= require_self
  */
+@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+
+body {
+	font-family: 'Nanum Gothic', serif;
+}
+
+#main-title {
+	text-align: center;
+	font-size: 4em;
+}
+
+#footer {
+	border-color: #101010;
+}
