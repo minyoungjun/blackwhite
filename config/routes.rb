@@ -14,12 +14,14 @@ Rails.application.routes.draw do
   post 'main/turn_action'
   post 'senders/json_action'
   post 'senders/game_start'
+  post 'pusher/auth'
   post 'senders/player_action.json' => 'senders#player_action'
   post 'senders/enemy_action.json' => 'senders#enemy_action'
   post 'senders/game_start.json' => 'senders#game_start'
   post 'senders/change_title.json' => "senders#change_title"
   post 'senders/send_chat.json' => "senders#send_chat"
   post 'senders/block_chat.json' => "senders#block_chat"
+  post 'senders/index_chat.json' => "senders#index_chat"
   post 'main/feedback'
   get 'main/read'
 

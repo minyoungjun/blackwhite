@@ -9,6 +9,16 @@ class SendersController < ApplicationController
         render :json => {:success => true, :wow => 1}
       end
   end
+
+  def index_chat
+
+    if 6 < ((Time.now - current_user.chats.last.created_at).round(0))
+      IndexMessage.perform_async(current_user.id, params[:chat_content])
+      render  :json => {:success => true, :wow => "wow"}
+    else
+      render  :json => {:success => false, :wow => "wow"}
+    end
+  end
   def send_chat
     room = Room.find(params[:id])
 

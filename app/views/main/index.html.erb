@@ -1,27 +1,72 @@
-<div class="well">
-    <p>제작자 왈: 업데이트 되면서 속도 빨라졌습니다. 그대신 했던 데이터는 날아갔습니다. 죄송합니다ㅠㅠ</p>
-</div><br>    
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" scrolling="no" src="//www.youtube.com/embed/eb5cGFRrmsg" frameborder="0" allowfullscreen></iframe>
-</div>
-<div class="page-header">
-    <h1>한 줄 게임규칙.</h1>
-</div>
-<ul>
-    <li>9판 5선승제 구성.</li>
-    <li>게임시작 누른 사람이 선공.</li>
-    <li>후공은 상대보다 커야만 승리(상대숫자와 같아도 후공이 진다).</li>
-    <li>즉, 5점 승점을 먼저 획득하는 사람이 최후 승리자!</li>
-</ul>
-<p>자세한 게임 규칙은 <a href="http://www.youtube.com/embed/eb5cGFRrmsg">위의 더 지니어스 게임 동영상</a> 을 참조해주세요!</p>
+<script type="text/javascript">
 
-<div class="page-header"></div>
+var pusher = new Pusher('f5cbfca5b8fc658dc583');
+var index_channel = pusher.subscribe('indexchat');
+var presenceChannel = pusher.subscribe('presence-index');
+var presenceAll = pusher.subscribe('presence-all');
+
+presenceChannel.bind('pusher:subscription_succeeded', function(members) {
+  $("#index_member").html(presenceChannel.members.count);
+})
+presenceChannel.bind('pusher:member_added', function(member) {
+  $("#index_member").html(presenceChannel.members.count);
+});
+presenceChannel.bind('pusher:member_removed', function(member) {
+  $("#index_member").html(presenceChannel.members.count);
+});
+
+presenceAll.bind('pusher:subscription_succeeded', function(members) {
+  $("#all_member").html(presenceAll.members.count);
+})
+presenceAll.bind('pusher:member_added', function(member) {
+  $("#all_member").html(presenceAll.members.count);
+});
+presenceAll.bind('pusher:member_removed', function(member) {
+  $("#all_member").html(presenceAll.members.count);
+});
+
+
+index_channel.bind('say', function(data) {
+  $("#chat_box").append('<p>' + data.message + '</p>');
+  $("#chat_box :last-child").effect("highlight", {color: '#fff'}, 1000);
+  $("#chat_box").scrollTop($("#chat_box").height());
+});
+
+    function send_chat(){
+    var url = "/senders/index_chat.json";
+    $.ajax({
+      type: "POST",
+      url:url,
+      data: {
+      chat_content: $("#chat_content").val(),
+      authenticity_token: '<%=form_authenticity_token()%>'
+    },
+    dataType:"JSON",
+    success: function(data){
+      if (data["success"]){
+        $("#chat_content").val("");
+      }
+        
+      else {
+        alert("도배를 하실 수 없습니다.");
+      }
+        return false;
+      },
+      error: function(){
+        alert("전송실패");
+      }
+    });
+     
+    }
+
+
+</script>
+
 <% if user_signed_in?%>
-<p><%=@user.email%>님, 환영합니다!</p>
-<p>총 전적: <%=@user.victories.count%>승/<%=@user.loses.count%>패</p>
-<a href="<%=destroy_user_session_path%>">로그아웃</a>
-<br>
+<p>실시간 전체 접속자수:<a id="all_member"></a>명, 대기실 대기인원:<a id="index_member"></a>명</p>
+<p><%=@user.email%>(<%=@user.victories.count%>승/<%=@user.loses.count%>패)님, 환영합니다!</p>
 <a href="/main/new_room">방만들기</a>
+<a href="<%=destroy_user_session_path%>">로그아웃</a>
 <%else%>
 <p>3초만에 할 수 있는 회원가입을 하셔야 방 만들기와 전적관리를 하실 수 있습니다.</p>
 <a href="/users/sign_up">3초만에 회원가입</a>
@@ -29,7 +74,7 @@
 <%end%>
 
 
-<h2>참여 가능 방목록(1명 있는 방)</h2>
+<h2>참여 가능 방목록</h2>
 <% room_num = 0%>
 <% @rooms.each do |room|%>
 <%if room.players.count < 2%>
@@ -42,3 +87,38 @@
 열려있는 방이 없습니다.
 </p>
 <%end%>
+
+    <div class="chat_container">
+        <h4><i class="fa fa-comments"></i> 대기실 실시간 채팅</h4>
+        <div id="chat_box">
+        </div>
+        <div class="input-group" >
+            <input type="text" class="form-control" id="chat_content">
+            <span class="input-group-btn">
+            <button class="btn btn-default" onclick="send_chat();">전송</button>
+            </span>
+        </div>
+    </div>
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" scrolling="no" src="//www.youtube.com/embed/eb5cGFRrmsg" frameborder="0" allowfullscreen></iframe>
+</div>
+<ul>
+    <li>9판 5선승제 구성.</li>
+    <li>게임시작 누른 사람이 선공.</li>
+    <li>후공은 상대보다 커야만 승리(상대숫자와 같아도 후공이 진다).</li>
+    <li>즉, 5점 승점을 먼저 획득하는 사람이 최후 승리자!</li>
+</ul>
+<p>자세한 게임 규칙은 <a href="http://www.youtube.com/embed/eb5cGFRrmsg">위의 더 지니어스 게임 동영상</a> 을 참조해주세요!</p>
+
+<div class="page-header"></div>
+
+<script>
+
+$('#chat_content').keypress( function(event) {
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if (keycode == '13'){
+        send_chat();
+    }
+});
+
+</script>

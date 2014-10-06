@@ -1,49 +1,71 @@
 <script type="text/javascript">
 var pusher = new Pusher('f5cbfca5b8fc658dc583');
+
 var channel = pusher.subscribe('<%=@player.token%>');
+var presenceAll = pusher.subscribe('presence-all');
+var presenceRoom = pusher.subscribe('presence-<%=@room.id%>');
+
+presenceRoom.bind('pusher:member_removed', function(member) {
+
+  $("#chat_box").append('<p>상대방이 방에서 퇴장하였습니다.</p>');
+  $("#chat_box :last-child").effect("highlight", {color: '#fff'}, 1000);
+  $("#chat_box").scrollTop($("#chat_box").height());
+
+  alert("상대방이 방에서 퇴장하였습니다.");
+
+});
+presenceRoom.bind('pusher:member_added', function(member) {
+
+  $("#chat_box").append('<p>상대방이 방으로 들어왔습니다.</p>');
+  $("#chat_box :last-child").effect("highlight", {color: '#fff'}, 1000);
+  $("#chat_box").scrollTop($("#chat_box").height());
+
+});
+
 channel.bind('come', function(data) {
-$("#start_btn").show();
-$("#waiting").hide();
-alert(data.message);
+  $("#start_btn").show();
+  $("#waiting").hide();
+  alert(data.message);
 });
 channel.bind('chat', function(data) {
-$("#chat_box").append('<p>' + data.message + '</p>');
-$("#chat_box :last-child").effect("highlight", {color: '#fff'}, 1000);
+  $("#chat_box").append('<p>' + data.message + '</p>');
+  $("#chat_box :last-child").effect("highlight", {color: '#fff'}, 1000);
+  $("#chat_box").scrollTop($("#chat_box").height());
 });
 channel.bind('starter', function(data) {
-$('#inform_text')[0].innerHTML = "게임이 시작되었습니다. 당신은 후공입니다.";
-$("#start_btn").hide();
-$('#my_number').hide();
-$('#btn_sub').hide();
-$('#my_number').val("");
-enemy_action(<%=@room.id%>);
-return false;
+  $('#inform_text')[0].innerHTML = "게임이 시작되었습니다. 당신은 후공입니다.";
+  $("#start_btn").hide();
+  $('#my_number').hide();
+  $('#btn_sub').hide();
+  $('#my_number').val("");
+  enemy_action(<%=@room.id%>);
+  return false;
 });
 channel.bind('reminder', function(data) {
-document.getElementById("inform_text").innerHTML = "상대가 숫자를 제출했습니다. 당신의 숫자를 제출해주세요.";
-$('#my_number').show();
-$('#btn_sub').show();
-enemy_action(<%=@room.id%>);
+  document.getElementById("inform_text").innerHTML = "상대가 숫자를 제출했습니다. 당신의 숫자를 제출해주세요.";
+  $('#my_number').val("");
+  $('#my_number').show();
+  $('#btn_sub').show();
+  enemy_action(<%=@room.id%>);
 });
 channel.bind('is_first_result', function(data) {
-if (data.win){
-document.getElementById("inform_text").innerHTML = "방금 턴에는 상대편이 승점을 얻었습니다ㅠㅠ 이제 당신이 후공이므로 상대가 낼 때까지 기다려주세요.";
-$('#my_number').hide();
-$('#my_number').val("");
-$('#btn_sub').hide();
-enemy_action(<%=@room.id%>);
-}
-else{
-document.getElementById("inform_text").innerHTML = "방금 턴에는 당신이 승점을 얻었습니다.이제 당신이 후공이므로 상대가 낼 때까지 기다려주세요.";
-$('#my_number').hide();
-$('#my_number').val("");
-$('#btn_sub').hide();
-enemy_action(<%=@room.id%>);
-}
-return false;
+  if (data.win){
+  document.getElementById("inform_text").innerHTML = "방금 턴에는 상대편이 승점을 얻었습니다ㅠㅠ 이제 당신이 후공이므로 상대가 낼 때까지 기다려주세요.";
+  $('#my_number').hide();
+  $('#my_number').val("");
+  $('#btn_sub').hide();
+  enemy_action(<%=@room.id%>);
+  }
+  else{
+  document.getElementById("inform_text").innerHTML = "방금 턴에는 당신이 승점을 얻었습니다.이제 당신이 후공이므로 상대가 낼 때까지 기다려주세요.";
+  $('#my_number').hide();
+  $('#my_number').val("");
+  $('#btn_sub').hide();
+  enemy_action(<%=@room.id%>);
+  }
+  return false;
 });
 </script>
-<a href="/main/index"><h3>흑과백2 메인화면으로</h3></a>
 <%if @room.user_id == @user.id %>
 방 제목:<input type="text" style="height: 25px; font-size: 20px;" value="<%=@room.title%>" id="room_title"><a href="#" onclick="javascript:change_title(<%=@room.id%>);">제목변경</a><br><br>
 <%else%>
@@ -124,19 +146,17 @@ $('#start_btn').hide();
             </td>
         </tr>
     </table>
-    <div style="border-radius: 5px; background-color: #222;
-    border-color: #101010; padding-top: 10px;">
-        <h4 style="color: #fff; text-align: center; margin-bottom: 20px;"><i class="fa fa-comments"></i> 채팅창</h4>
-        <div id="chat_box" style="color: #fff; margin: 2px 5px;">
+    <div class="chat_container">
+        <h4><i class="fa fa-comments"></i> 채팅창</h4>
+        <div id="chat_box">
         </div>
-        <div class="input-group" style="margin-top: 5px;">
+        <div class="input-group" >
             <input type="text" class="form-control"id="chat_content">
             <span class="input-group-btn">
             <button class="btn btn-default" onclick="send_chat(<%=@room.id%>)">전송</button>
             </span>
         </div>
     </div>
-    <p>참고)상대방이 채팅 답장 없으면 나간거임 ㅇㅇ... 그리고 상대방이 욕하면 그냥 나가셈</p>
     <a href="javascript:block_chat(<%=@room.id%>);"><p>(대화차단하기)</p></a>
     <script type="text/javascript">
     function enemy_action(id){
@@ -229,167 +249,186 @@ $('#start_btn').hide();
     }
     function turn_action(id){
     var url = "/senders/player_action.json";
-    $.ajax({
-    type: "POST",
-    url:url,
-    data: {
-    amount: $('#my_number').val(),
-    id: id,
-    authenticity_token: '<%=form_authenticity_token()%>'
-    },
-    dataType:"JSON",
-    success: function(data){
-    if (data["success"]){
-    if (data["is_first"]){
-    
-    document.getElementById("player_real").innerHTML = data["player_real"];
-    document.getElementById("inform_text").innerHTML ="숫자를 제출했습니다. 상대방을 기다립니다.";
-    $('#inform_text2')[0].innerHTML="";
-    $('#my_number').hide();
-    $('#btn_sub').hide();
-    $('#my_number').val("");
-    
-    }else{
-    if(data["win"]){
-    
-    $('#inform_text')[0].innerHTML="당신이 승점을 얻었습니다.";
-    $('#inform_text2')[0].innerHTML="이번 턴은 당신이 선공입니다. 숫자를 내주세요.";
-    $('#my_number').show();
-    $('#btn_sub').show();
-    
-    }else{
-    $('#inform_text')[0].innerHTML="상대편이 승점을 얻었습니다.";
-    $('#inform_text2')[0].innerHTML="이번 턴은 당신이 선공입니다. 숫자를 내주세요.";
-    $('#my_number').show();
-    $('#btn_sub').show();
-    
-    }
-    
-    }
-    }
-    else {
-    alert("그렇게 할 수 없음");
-    }
-    enemy_action(<%=@room.id%>);
-    return false;
-    },
-    error: function(){
-    alert("잘못된 입력입니다.");
-    enemy_action(<%=@room.id%>);
-    }
-    });
+
+    if ($('#my_number').val() == ""){ alert("아무 것도 입력하지 않으셨습니다.");}
+
+    else{
+      var my_num = $('#my_number').val();
+      $('#my_number').val("");
+      $.ajax({
+        type: "POST",
+        url:url,
+        data: {
+          amount: my_num,
+          id: id,
+          authenticity_token: '<%=form_authenticity_token()%>'
+        },
+        dataType:"JSON",
+        success: function(data){
+        if (data["success"]){
+
+        $('#my_number').val("");
+        if (data["is_first"]){
+        
+        document.getElementById("player_real").innerHTML = data["player_real"];
+        document.getElementById("inform_text").innerHTML ="숫자를 제출했습니다. 상대방을 기다립니다.";
+        $('#inform_text2')[0].innerHTML="";
+        $('#my_number').hide();
+        $('#btn_sub').hide();
+        
+        }else{
+        if(data["win"]){
+        $('#my_number').val("");
+        
+        $('#inform_text')[0].innerHTML="당신이 승점을 얻었습니다.";
+        $('#inform_text2')[0].innerHTML="이번 턴은 당신이 선공입니다. 숫자를 내주세요.";
+        $('#my_number').show();
+        $('#btn_sub').show();
+        
+        }else{
+        $('#my_number').val("");
+        $('#inform_text')[0].innerHTML="상대편이 승점을 얻었습니다.";
+        $('#inform_text2')[0].innerHTML="이번 턴은 당신이 선공입니다. 숫자를 내주세요.";
+        $('#my_number').show();
+        $('#btn_sub').show();
+        
+        }
+        
+        }
+        }
+        else {
+        alert("그렇게 할 수 없음");
+        }
+        enemy_action(<%=@room.id%>);
+        return false;
+        },
+        error: function(){
+        alert("잘못된 입력입니다.");
+        enemy_action(<%=@room.id%>);
+        }
+        });
+      }
     }
     function game_start(id){
     var url = "/senders/game_start.json";
-    $.ajax({
-    type: "POST",
-    url:url,
-    data: {
-    id: id,
-    authenticity_token: '<%=form_authenticity_token()%>'
-    },
-    dataType:"JSON",
-    success: function(data){
-    if (data["success"]){
-    $('#inform_text')[0].innerHTML="게임이 시작되었습니다. 당신은 선공입니다.";
-    $('#start_btn').hide();
-    $('#my_number').show();
-    $('#btn_sub').show();
-    enemy_action(<%=@room.id%>);
-    
-    }
+      $.ajax({
+      type: "POST",
+      url:url,
+      data: {
+      id: id,
+      authenticity_token: '<%=form_authenticity_token()%>'
+      },
+      dataType:"JSON",
+      success: function(data){
+      if (data["success"]){
+        $('#inform_text')[0].innerHTML="게임이 시작되었습니다. 당신은 선공입니다.";
+        $('#start_btn').hide();
+        $('#my_number').show();
+        $('#btn_sub').show();
+        enemy_action(<%=@room.id%>);
+      
+      }
     else {
-    alert("한명이 더 있어야 시작할 수 있습니다.");
-    }
-    return false;
-    },
-    error: function(){
-    alert("시작 실패");
-    }
-    });
+      alert("한명이 더 있어야 시작할 수 있습니다.");
+      }
+        return false;
+      },
+      error: function(){
+        alert("시작 실패");
+      }
+      });
     }
     function change_title(id){
     var url = "/senders/change_title.json";
-    $.ajax({
-    type: "POST",
-    url:url,
-    data: {
-    title: $("#room_title").val(),
-    id: id,
-    authenticity_token: '<%=form_authenticity_token()%>'
-    },
-    dataType:"JSON",
-    success: function(data){
-    if (data["success"]){
-    alert( data["title"] + "로 바꿨습니다.");
-    
-    }
-    else {
-    alert("바꿀 수 없습니다.");
-    }
-    return false;
-    },
-    error: function(){
-    alert("연결이 불안정합니다.");
-    }
-    });
+      $.ajax({
+        type: "POST",
+        url:url,
+        data: {
+        title: $("#room_title").val(),
+        id: id,
+        authenticity_token: '<%=form_authenticity_token()%>'
+        },
+        dataType:"JSON",
+        success: function(data){
+          if (data["success"]){
+          alert( data["title"] + "로 바꿨습니다.");
+          
+          }
+          else {
+            alert("바꿀 수 없습니다.");
+          }
+          return false;
+        },
+        error: function(){
+        alert("연결이 불안정합니다.");
+        }
+      });
     }
     function send_chat(id){
     var url = "/senders/send_chat.json";
     $.ajax({
-    type: "POST",
-    url:url,
-    data: {
-    chat_content: $("#chat_content").val(),
-    id: id,
-    authenticity_token: '<%=form_authenticity_token()%>'
+      type: "POST",
+      url:url,
+      data: {
+      chat_content: $("#chat_content").val(),
+      id: id,
+      authenticity_token: '<%=form_authenticity_token()%>'
     },
     dataType:"JSON",
     success: function(data){
-    if (data["success"]){
-    if(data["blocked"]){
-    alert("상대방이 대화를 차단했습니다.");
-    }else{
-    alert("메세지를 보냈습니다.");}
-    
-    }
-    else {
-    alert("전송실패");
-    }
-    return false;
-    },
-    error: function(){
-    alert("전송실패");
-    }
+      if (data["success"]){
+        if(data["blocked"]){
+          alert("상대방이 대화를 차단했습니다.");
+          }else{
+
+        
+        }
+        
+        }
+      else {
+        alert("전송실패");
+      }
+        return false;
+      },
+      error: function(){
+        alert("전송실패");
+      }
     });
     
     
     }
     function block_chat(id){
-    var url = "/senders/block_chat.json";
-    $.ajax({
-    type: "POST",
-    url:url,
-    data: {
-    id: id,
-    authenticity_token: '<%=form_authenticity_token()%>'
-    },
-    dataType:"JSON",
-    success: function(data){
-    if (data["success"]){
-    alert("대화를 차단했습니다.");
-    
+      var url = "/senders/block_chat.json";
+      $.ajax({
+      type: "POST",
+      url:url,
+      data: {
+      id: id,
+      authenticity_token: '<%=form_authenticity_token()%>'
+      },
+      dataType:"JSON",
+      success: function(data){
+      if (data["success"]){
+        alert("대화를 차단했습니다.");
+      
+      }
+      else {
+        alert("오류");
+      }
+        return false;
+      },
+      error: function(){
+        alert("오류");
+      }
+      });
+         
     }
-    else {
-    alert("오류");
+
+$('#chat_content').keypress( function(event) {
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if (keycode == '13'){
+        send_chat(<%=@room.id%>);
     }
-    return false;
-    },
-    error: function(){
-    alert("오류");
-    }
-    });
-    
-    
-    }
-    </script>
+});
+
+</script>

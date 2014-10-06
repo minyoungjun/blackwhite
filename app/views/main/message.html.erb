@@ -1,0 +1,7 @@
+ <h2>만든 사람에게 하고 싶은 말</h2>
+  <form action="/main/feedback" method="post">
+    <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>" />
+    <textarea name="content"></textarea><br>
+    <input type="submit"value="보내기">
+    <p>만들기 쉽고 재밌는 게임 추천 좀</p>
+  </form>

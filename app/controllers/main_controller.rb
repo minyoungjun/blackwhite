@@ -59,10 +59,9 @@ class MainController < ApplicationController
       @user = user
     end
 
-    if @room.games.count == 0 && @room.players.where(:user_id => current_user.id).count > 0
+    if @room.players.where(:user_id => current_user.id).count > 0
       @player = @room.players.where(:user_id => current_user.id).first
     else
-
       if @room.players.first.user == current_user
         @player = @room.players.first
       elsif @room.players.where(user_id: current_user.id).count == 0 && @room.players.count == 1
