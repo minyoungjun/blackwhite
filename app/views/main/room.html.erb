@@ -376,12 +376,12 @@ $('#start_btn').hide();
     },
     dataType:"JSON",
     success: function(data){
-      if (data["success"]){
+    if (data["success"]){
+
+      $("#chat_content").val("");
         if(data["blocked"]){
           alert("상대방이 대화를 차단했습니다.");
-          }else{
-
-        
+          }else{       
         }
         
         }

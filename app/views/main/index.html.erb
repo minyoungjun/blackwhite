@@ -32,6 +32,11 @@ index_channel.bind('say', function(data) {
   $("#chat_box").scrollTop($("#chat_box").height());
 });
 
+index_channel.bind('new_room', function(data){
+    $("#room_list").append('<a href="/main/room/' + data.room_id + '"><p>' + data.room_id + '번 방(방장 전적:' + data.win + '승/' + data.lose + '패)</p></a>');
+ $(".none_room").hide();
+});
+
     function send_chat(){
     var url = "/senders/index_chat.json";
     $.ajax({
@@ -75,18 +80,21 @@ index_channel.bind('say', function(data) {
 
 
 <h2>참여 가능 방목록</h2>
+<div id = "room_list">
 <% room_num = 0%>
 <% @rooms.each do |room|%>
-<%if room.players.count < 2%>
-<a href="/main/room/<%=room.id%>"><p><%=room.title%>(방장 전적: <%=room.user.victories.count%>승/<%=room.user.loses.count%>패)</p></a>
-<%room_num = room_num + 1%>
-<%end%>
+  <%if room.players.count < 2%>
+    <a href="/main/room/<%=room.id%>"><p><%=room.title%>(방장 전적: <%=room.user.victories.count%>승/<%=room.user.loses.count%>패)</p></a>
+    <%room_num = room_num + 1%>
+  <%end%>
 <%end%>
 <%if room_num == 0%>
-<p>
-열려있는 방이 없습니다.
-</p>
+  <p class="none_room">
+    열려있는 방이 없습니다.
+  </p>
 <%end%>
+</div>
+
 
     <div class="chat_container">
         <h4><i class="fa fa-comments"></i> 대기실 실시간 채팅</h4>

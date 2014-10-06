@@ -29,6 +29,7 @@ class MainController < ApplicationController
   end
 
   def new_room
+
      room = Room.new
      room.user_id = current_user.id
      room.save
@@ -40,6 +41,8 @@ class MainController < ApplicationController
      player.user_id = current_user.id
      player.token = SecureRandom.hex(10)
      player.save
+
+     Pusher["indexchat"].trigger('new_room', { room_id: room.id , win: current_user.victories.count, lose: current_user.loses.count })
 
      redirect_to :action => "room", "id" => room.id
   end
