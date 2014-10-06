@@ -1,6 +1,6 @@
 #coding: utf-8연락
 class MainController < ApplicationController
-  def help
+  def message
   end 
   def feedback
     letter = Letter.new

@@ -1,10 +1,21 @@
-<div class="page-header">
-    <h1>제작자 공지</h1>
+<div class="well">
+    <p>제작자 왈: 업데이트 되면서 속도 빨라졌습니다. 그대신 했던 데이터는 날아갔습니다. 죄송합니다ㅠㅠ</p>
+</div><br>    
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" scrolling="no" src="//www.youtube.com/embed/eb5cGFRrmsg" frameborder="0" allowfullscreen></iframe>
 </div>
-<p class="lead">"업데이트 되면서 속도 빨라졌습니다. 그대신 했던 데이터는 날아갔습니다. 죄송합니다ㅠㅠ"</p>
+<div class="page-header">
+    <h1>한 줄 게임규칙.</h1>
+</div>
+<ul>
+    <li>9판 5선승제 구성.</li>
+    <li>게임시작 누른 사람이 선공.</li>
+    <li>후공은 상대보다 커야만 승리(상대숫자와 같아도 후공이 진다).</li>
+    <li>즉, 5점 승점을 먼저 획득하는 사람이 최후 승리자!</li>
+</ul>
+<p>자세한 게임 규칙은 <a href="http://www.youtube.com/embed/eb5cGFRrmsg">위의 더 지니어스 게임 동영상</a> 을 참조해주세요!</p>
 
-
-
+<div class="page-header"></div>
 <% if user_signed_in?%>
 <p><%=@user.email%>님, 환영합니다!</p>
 <p>총 전적: <%=@user.victories.count%>승/<%=@user.loses.count%>패</p>
@@ -16,8 +27,8 @@
 <a href="/users/sign_up">3초만에 회원가입</a>
 <a href="/users/sign_in">로그인</a>
 <%end%>
-<iframe width="100%"  scrolling="no"  src="//www.youtube.com/embed/eb5cGFRrmsg" frameborder="0" allowfullscreen></iframe>
-<p>게임규칙: 9판 5선승제<br> 게임시작 누른 사람이 선공<br> 후공은 상대보다 커야만 승리(상대숫자와 같아도 후공이 진다.)
+
+
 <h2>참여 가능 방목록(1명 있는 방)</h2>
 <% room_num = 0%>
 <% @rooms.each do |room|%>
@@ -31,10 +42,3 @@
 열려있는 방이 없습니다.
 </p>
 <%end%>
-<h2>만든 사람에게 하고 싶은 말</h2>
-<form action="/main/feedback" method="post">
-    <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>" />
-    <textarea name="content"></textarea><br>
-    <input type="submit"value="보내기">
-    <p>만들기 쉽고 재밌는 게임 추천 좀</p>
-</form>
