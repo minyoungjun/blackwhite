@@ -12,8 +12,20 @@ class SendersController < ApplicationController
 
   def index_chat
 
-    if current_user.chats.count == 0 || 3 < ((Time.now - current_user.chats.last.created_at).round(0))
-      IndexMessage.perform_async(current_user.id, params[:chat_content])
+    if user_signed_in?
+    @user = current_user
+    else
+      user = User.new({
+        email: "anonymous@#{SecureRandom.hex(10)}.com",
+      password: 'password',
+      password_confirmation: 'password'})
+      user.save
+      sign_in user
+      @user = user
+    end
+
+    if @user.chats.count == 0 || 3 < ((Time.now - @user.chats.last.created_at).round(0))
+      IndexMessage.perform_async(@user.id, params[:chat_content])
       render  :json => {:success => true, :wow => "wow"}
     else
       render  :json => {:success => false, :wow => "wow"}

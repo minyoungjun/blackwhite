@@ -67,8 +67,8 @@ index_channel.bind('new_room', function(data){
 
 </script>
 
-<% if user_signed_in?%>
 <p>실시간 전체 접속자수:<a id="all_member"></a>명, 대기실 대기인원:<a id="index_member"></a>명</p>
+<% if user_signed_in?%>
 <p><%=@user.email%>(<%=@user.victories.count%>승/<%=@user.loses.count%>패)님, 환영합니다!</p>
 <a href="/main/new_room">방만들기</a>
 <a href="<%=destroy_user_session_path%>">로그아웃</a>
