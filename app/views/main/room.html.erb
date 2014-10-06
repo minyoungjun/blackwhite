@@ -9,8 +9,8 @@ presenceRoom.bind('pusher:member_removed', function(member) {
 
   $("#chat_box").append('<p>상대방이 방에서 퇴장하였습니다.</p>');
   $("#chat_box :last-child").effect("highlight", {color: '#fff'}, 1000);
-  $("#chat_box").scrollTop($("#chat_box").height());
 
+  $('#chat_box').animate({scrollTop: $('#chat_box').prop("scrollHeight")}, 500);
   alert("상대방이 방에서 퇴장하였습니다.");
 
 });
@@ -18,7 +18,7 @@ presenceRoom.bind('pusher:member_added', function(member) {
 
   $("#chat_box").append('<p>상대방이 방으로 들어왔습니다.</p>');
   $("#chat_box :last-child").effect("highlight", {color: '#fff'}, 1000);
-  $("#chat_box").scrollTop($("#chat_box").height());
+  $('#chat_box').animate({scrollTop: $('#chat_box').prop("scrollHeight")}, 500);
 
 });
 
@@ -26,12 +26,17 @@ channel.bind('come', function(data) {
   $("#start_btn").show();
   $("#waiting").hide();
   alert(data.message);
-});
+  });
+
+
 channel.bind('chat', function(data) {
   $("#chat_box").append('<p>' + data.message + '</p>');
   $("#chat_box :last-child").effect("highlight", {color: '#fff'}, 1000);
-  $("#chat_box").scrollTop($("#chat_box").height());
+  $('#chat_box').animate({scrollTop: $('#chat_box').prop("scrollHeight")}, 500);
+
 });
+
+
 channel.bind('starter', function(data) {
   $('#inform_text')[0].innerHTML = "게임이 시작되었습니다. 당신은 후공입니다.";
   $("#start_btn").hide();

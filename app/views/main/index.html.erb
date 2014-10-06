@@ -29,7 +29,7 @@ presenceAll.bind('pusher:member_removed', function(member) {
 index_channel.bind('say', function(data) {
   $("#chat_box").append('<p>' + data.message + '</p>');
   $("#chat_box :last-child").effect("highlight", {color: '#fff'}, 1000);
-  $("#chat_box").scrollTop($("#chat_box").height());
+  $('#chat_box').animate({scrollTop: $('#chat_box').prop("scrollHeight")}, 500);
 });
 
 index_channel.bind('new_room', function(data){
