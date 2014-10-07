@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   post 'senders/json_action'
   post 'senders/game_start'
   post 'pusher/auth'
+  post 'pusher/webhook'
   post 'senders/player_action.json' => 'senders#player_action'
   post 'senders/enemy_action.json' => 'senders#enemy_action'
   post 'senders/game_start.json' => 'senders#game_start'
