@@ -24,18 +24,14 @@ class SendersController < ApplicationController
       @user = user
     end
 
-    if @user.chats.count == 0 || 3 < ((Time.now - @user.chats.last.created_at).round(0))
-      IndexMessage.perform_async(@user.id, params[:chat_content])
-      render  :json => {:success => true, :wow => "wow"}
-    else
-      render  :json => {:success => false, :wow => "wow"}
-    end
+    IndexMessage.perform_async(@user.id, params[:chat_content])
+    render  :json => {:success => true, :wow => "wow"}
   end
   def send_chat
     room = Room.find(params[:id])
 
     if room.players.where(:user_id => current_user.id).count != 0
-      if !(room.chat_blocked) && ( current_user.chats.count == 0 || 2 < ((Time.now - current_user.chats.last.created_at).round(0)))
+      if !(room.chat_blocked)
         SendMessage.perform_async(room.id, current_user.id, params[:chat_content])
       end
       render :json => {:success => true, :blocked => room.chat_blocked }
