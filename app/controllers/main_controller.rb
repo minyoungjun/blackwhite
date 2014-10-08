@@ -24,7 +24,7 @@ class MainController < ApplicationController
 
   def index
 
-  @rooms = Room.all
+    @rooms = Room.where(created_at: 30.minute.ago..Time.zone.now)
   @user = current_user
   end
 
